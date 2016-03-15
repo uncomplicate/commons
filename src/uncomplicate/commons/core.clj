@@ -43,3 +43,15 @@
                                   (release-seq ~(bindings 0)))))
     :else (throw (IllegalArgumentException.
                   "with-release only allows Symbols in bindings"))))
+
+(defn wrap-int ^ints [^long x]
+  (doto (int-array 1) (aset 0 x)))
+
+(defn wrap-long ^longs [^long x]
+  (doto (long-array 1) (aset 0 x)))
+
+(defn wrap-float ^floats [^double x]
+  (doto (float-array 1) (aset 0 x)))
+
+(defn wrap-double ^doubles [^double x]
+  (doto (double-array 1) (aset 0 x)))

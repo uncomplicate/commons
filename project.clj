@@ -1,4 +1,4 @@
-(defproject uncomplicate/commons "0.1.0"
+(defproject uncomplicate/commons "0.2.0-SNAPSHOT"
   :description "Common Uncomplicate utillities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
