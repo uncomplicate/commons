@@ -1,6 +1,8 @@
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.core)
 
+;; ===================== Releaseable =================================
+
 (defprotocol Releaseable
   "Objects that hold resources that can be released after use. For OpenCL
   objects, releasing  means decrementing the reference count of the object.
@@ -44,6 +46,8 @@
     :else (throw (IllegalArgumentException.
                   "with-release only allows Symbols in bindings"))))
 
+;; =================== Array wrappers ==================================
+
 (defn wrap-int ^ints [^long x]
   (doto (int-array 1) (aset 0 x)))
 
@@ -55,3 +59,31 @@
 
 (defn wrap-double ^doubles [^double x]
   (doto (double-array 1) (aset 0 x)))
+
+;; ==================== Primitive function builders =====================
+
+(defmacro double-fn [f]
+  `(fn
+     (^double []
+      (~f))
+     (^double [^double x#]
+      (~f x#))
+     (^double [^double x# ^double y#]
+      (~f x# y#))
+     (^double [^double x# ^double y# ^double z#]
+      (~f x# y# z#))
+     (^double [^double x# ^double y# ^double z# ^double v#]
+      (~f x# y# z# v#))))
+
+(defmacro long-fn [f]
+  `(fn
+     (^long []
+      (~f))
+     (^long [^long x#]
+      (~f x#))
+     (^long [^long x# ^long y#]
+      (~f x# y#))
+     (^long [^long x# ^long y# ^long z#]
+      (~f x# y# z#))
+     (^long [^long x# ^long y# ^long z# ^long v#]
+      (~f x# y# z# v#))))
