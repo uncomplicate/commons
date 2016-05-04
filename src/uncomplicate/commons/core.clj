@@ -46,6 +46,36 @@
     :else (throw (IllegalArgumentException.
                   "with-release only allows Symbols in bindings"))))
 
+(defmacro let-release
+  "Binds Releasable elements to symbols (like let do), evaluates
+  body, and, if any exception occures, releases the resources held by the bindings.
+  The bindings can also be deeply sequential (see examples)
+  - they will be released properly.
+
+  Example:
+
+      (let-release [devs (devices (first (platforms)))
+                    dev (first devs)
+                    ctx (context devs)
+                    queue (command-queue ctx dev)]
+        (info dev)
+        (info queue))
+  "
+  [bindings & body]
+  (assert (vector? bindings) "a vector for its binding")
+  (assert (even? (count bindings)) "an even number of forms in binding vector")
+  (cond
+    (= (count bindings) 0) `(do ~@body)
+    (symbol? (bindings 0)) `(let ~(subvec bindings 0 2)
+                              (try
+                                (let-release ~(subvec bindings 2) ~@body)
+                                (catch Exception e#
+                                  (do
+                                    (release-seq ~(bindings 0))
+                                    (throw e#)))))
+    :else (throw (IllegalArgumentException.
+                  "try-release only allows Symbols in bindings"))))
+
 ;; =================== Array wrappers ==================================
 
 (defn wrap-int ^ints [^long x]
