@@ -6,6 +6,9 @@
 (defprotocol Releaseable
   "Objects that hold resources that can be released after use. For OpenCL
   objects, releasing  means decrementing the reference count of the object.
+
+  The errors should be signalled by throwing an exception rather than
+  by the return value.
   "
   (release [this]
     "Releases the resource held by this."))
@@ -89,6 +92,7 @@
 
 (defn wrap-double ^doubles [^double x]
   (doto (double-array 1) (aset 0 x)))
+
 
 ;; ==================== Primitive function builders =====================
 

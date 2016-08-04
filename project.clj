@@ -1,4 +1,4 @@
-(defproject uncomplicate/commons "0.2.0"
+(defproject uncomplicate/commons "0.2.1-SNAPSHOT"
   :description "Common Uncomplicate utillities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
@@ -11,8 +11,8 @@
           :src-linenum-anchor-prefix "L"
           :output-path "docs/codox"}
 
-  :profiles {:dev {:plugins [[lein-midje "3.1.3"]
-                             [lein-codox "0.9.4"]]
+  :profiles {:dev {:plugins [[lein-midje "3.2"]
+                             [lein-codox "0.9.5"]]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true
                                  *unchecked-math* :warn-on-boxed
