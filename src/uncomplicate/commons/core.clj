@@ -27,7 +27,7 @@
   "
   [this]
   (if (sequential? this)
-    (map release-seq this)
+    (doall (map release-seq this))
     (release this)))
 
 (defmacro with-release
