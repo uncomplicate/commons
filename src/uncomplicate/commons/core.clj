@@ -21,14 +21,21 @@
   (release [this]
     "Releases the resource held by this."))
 
-(defn release-seq
-  "if this is a releaseable object, releases it; if it is a (possibly nested)
-  sequence of releaseable objects, calls itself on each element.
-  "
+(extend-type java.lang.Object
+  Releaseable
+  (release [_]
+    true))
+
+(extend-type clojure.lang.Sequential
+  Releaseable
+  (release [this]
+    (reduce #(release %2) true this)
+    true))
+
+(defn releaseable?
+  "Checks whether this is releaseable (in terms of Releaseable protocol)."
   [this]
-  (if (sequential? this)
-    (doall (map release-seq this))
-    (release this)))
+  (satisfies? Releaseable this))
 
 (defmacro with-release
   "Binds Releasable elements to symbols (like let do), evaluates
@@ -53,7 +60,7 @@
                               (try
                                 (with-release ~(subvec bindings 2) ~@body)
                                 (finally
-                                  (release-seq ~(bindings 0)))))
+                                  (release ~(bindings 0)))))
     :else (throw (IllegalArgumentException.
                   "with-release only allows Symbols in bindings"))))
 
@@ -82,7 +89,7 @@
                                 (let-release ~(subvec bindings 2) ~@body)
                                 (catch Exception e#
                                   (do
-                                    (release-seq ~(bindings 0))
+                                    (release ~(bindings 0))
                                     (throw e#)))))
     :else (throw (IllegalArgumentException.
                   "try-release only allows Symbols in bindings"))))

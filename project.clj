@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.2.2"
+(defproject uncomplicate/commons "0.3.0-SNAPSHOT"
   :description "Common Uncomplicate utillities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
@@ -20,7 +20,7 @@
           :output-path "docs/codox"}
 
   :profiles {:dev {:plugins [[lein-midje "3.2"]
-                             [lein-codox "0.9.5"]]
+                             [lein-codox "0.10.1"]]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true
                                  *unchecked-math* :warn-on-boxed
