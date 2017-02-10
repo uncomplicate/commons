@@ -94,6 +94,10 @@
     :else (throw (IllegalArgumentException.
                   "try-release only allows Symbols in bindings"))))
 
+(defprotocol Mappable
+  (mmap [this] [this flags])
+  (unmap [this mapped]))
+
 ;; =================== Array wrappers ==================================
 
 (defn wrap-int ^ints [^long x]
