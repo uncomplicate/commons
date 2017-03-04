@@ -7,7 +7,8 @@
 ;;   You must not remove this notice, or any other, from this software.
 
 (ns ^{:author "Dragan Djuric"}
-    uncomplicate.commons.core)
+    uncomplicate.commons.core
+  (:import [java.nio ByteBuffer DirectByteBuffer]))
 
 ;; ===================== Releaseable =================================
 
@@ -140,3 +141,14 @@
       (~f x# y# z#))
      (^long [^long x# ^long y# ^long z# ^long v#]
       (~f x# y# z# v#))))
+
+;; ==================== Buffer utils ======================================
+
+(defn clean-buffer
+  "Cleans the direct byte buffer using JVM's cleaner, and releases the memory
+  that resides outside JVM, wihich might otherwise linger very long until garbage
+  collected. See the Java documentation for DirectByteBuffer for more info."
+  [^ByteBuffer buffer]
+  (when (.isDirect buffer)
+    (.clean (.cleaner ^DirectByteBuffer buffer)))
+  true)
