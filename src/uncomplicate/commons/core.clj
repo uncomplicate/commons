@@ -27,6 +27,13 @@
   (release [_]
     true))
 
+(extend-type clojure.lang.IAtom
+  Releaseable
+  (release [this]
+    (let [res (release @this)]
+      (swap! this nil)
+      res)))
+
 (extend-type clojure.lang.Sequential
   Releaseable
   (release [this]

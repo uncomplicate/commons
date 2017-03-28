@@ -46,3 +46,9 @@
    (unmask1 table 10) => :b
 
    (unmask1 nil 0) => nil))
+
+(facts
+ "cond-into tests"
+ (cond-into {:a 1} true [:b 2] false [:c 3] (< 2 4) [:d 4]) => {:a 1 :b 2 :d 4}
+ (cond-into {:a 1}) => {:a 1}
+ (cond-into [1 2] true :a :b false :c :d) => [1 2 :a false :d])

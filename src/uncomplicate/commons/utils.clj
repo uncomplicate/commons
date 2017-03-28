@@ -90,3 +90,10 @@
   `(if (= 0 ~err-code)
      ~form
      (throw (~error-fn ~err-code ~(pr-str form)))))
+
+;; ======================= Conditional into =======================================
+
+(defn cond-into
+  ([x & s]
+   (into x (for [[c e] (partition 2 s) :when c]
+             e))))
