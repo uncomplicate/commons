@@ -27,6 +27,11 @@
   (release [_]
     true))
 
+(extend-type nil
+  Releaseable
+  (release [_]
+    true))
+
 (extend-type clojure.lang.IAtom
   Releaseable
   (release [this]
