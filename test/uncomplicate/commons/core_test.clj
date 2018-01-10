@@ -31,3 +31,7 @@
          (l+ 1 2) => (+ 1 2)
          (l+ 1 2 -5) => (+ 1 2 -5)
          (l+ 1 2 -5 100) => (+ 1 2 -5 100)))
+
+(facts "Test Cleaner."
+       (let [direct-buffer (java.nio.ByteBuffer/allocateDirect 8)]
+         (release direct-buffer) => true))

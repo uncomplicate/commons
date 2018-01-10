@@ -42,7 +42,16 @@
 (extend-type clojure.lang.Sequential
   Releaseable
   (release [this]
-    (reduce #(release %2) true this)
+    (doseq [r this]
+      (release r))
+    true))
+
+(extend-type ByteBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
+        (.clean cleaner)))
     true))
 
 (defn releaseable?
@@ -153,14 +162,3 @@
       (~f x# y# z#))
      (^long [^long x# ^long y# ^long z# ^long v#]
       (~f x# y# z# v#))))
-
-;; ==================== Buffer utils ======================================
-
-(defn clean-buffer
-  "Cleans the direct byte buffer using JVM's cleaner, and releases the memory
-  that resides outside JVM, wihich might otherwise linger very long until garbage
-  collected. See the Java documentation for DirectByteBuffer for more info."
-  [^ByteBuffer buffer]
-  (when (.isDirect buffer)
-    (.clean (.cleaner ^DirectByteBuffer buffer)))
-  true)
