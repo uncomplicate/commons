@@ -48,7 +48,7 @@
   [table ^long mask]
   (filter identity
           (map (fn [[k v]]
-                 (if (= 0 (bit-and mask (long v)))
+                 (if (= 0 (bit-and mask ^long v))
                    nil
                    k))
                table)))
@@ -69,7 +69,7 @@
   [table ^long mask]
   (some identity
         (map (fn [[k v]]
-               (if (= 0 (bit-and mask (long v)))
+               (if (= 0 (bit-and mask ^long v))
                    nil
                    k))
              table)))
