@@ -7,7 +7,8 @@
 ;;   You must not remove this notice, or any other, from this software.
 
 (ns ^{:author "Dragan Djuric"}
-    uncomplicate.commons.utils)
+    uncomplicate.commons.utils
+  (:import java.nio.file.Paths))
 
 ;; ========= Bitfild masks ========================================
 
@@ -77,7 +78,7 @@
 ;; ====================== Error checking ==========================================
 
 (defmacro with-check
-  "Evaluates `form` if `err-code` is not zero (e.g. `CL_SUCCESS`), otherwise throws
+  "Evaluates `form` if `status` is not zero (e.g. `CL_SUCCESS`), otherwise throws
   an appropriate `ExceptionInfo` with decoded informative details.
   It helps with native interop methods that return error codes directly, while
   returning computation results through side-effects in arguments.
@@ -86,10 +87,11 @@
 
       (with-check (some-call-that-returns-error-code) result)
   "
-  [error-fn err-code form]
-  `(if (= 0 ~err-code)
-     ~form
-     (throw (~error-fn ~err-code ~(pr-str form)))))
+  [error-fn status form]
+  `(let [status# ~status]
+     (if (= 0 status#)
+       ~form
+       (throw (~error-fn status# ~(pr-str form))))))
 
 ;; ======================= Conditional into =======================================
 
@@ -97,3 +99,12 @@
   ([x & s]
    (into x (for [[c e] (partition 2 s) :when c]
              e))))
+
+;; ======================= Path Helpers ==========================================
+
+(defn path [^String path-name ^String file-name & file-names]
+  (let [file-array (if file-names
+                     (into-array String (cons file-name file-names))
+                     (doto (make-array String 1)
+                       (aset 0 file-name)))]
+    (Paths/get path-name file-array)))
