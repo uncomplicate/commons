@@ -8,7 +8,8 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.utils
-  (:import java.nio.file.Paths))
+  (:import java.nio.file.Paths
+           [java.nio ByteBuffer DirectByteBuffer ByteOrder]))
 
 ;; ========= Bitfild masks ========================================
 
@@ -108,3 +109,25 @@
                      (doto (make-array String 1)
                        (aset 0 file-name)))]
     (Paths/get path-name file-array)))
+
+;; ======================= Buffer utils ==========================================
+
+(defn buffer [^long size]
+  (let [buff (ByteBuffer/allocateDirect size)]
+    (.order ^ByteBuffer buff (ByteOrder/nativeOrder))
+    buff))
+
+(defn direct-buffer [^long size]
+  (let [buff (ByteBuffer/allocateDirect size)]
+    (.order ^ByteBuffer buff (ByteOrder/nativeOrder))
+    buff))
+
+(defn slice-buffer [^ByteBuffer buf ^long ofst ^long len]
+  (when buf
+    (let [ord (.order buf)
+          res (.duplicate buf)]
+      (.position res ofst)
+      (.limit res (+ ofst len))
+      (.slice res)
+      (.order res)
+      res)))
