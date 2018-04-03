@@ -106,8 +106,9 @@
 (defn path [^String path-name ^String file-name & file-names]
   (let [file-array (if file-names
                      (into-array String (cons file-name file-names))
-                     (doto (make-array String 1)
-                       (aset 0 file-name)))]
+                     (let [res (make-array String 1)]
+                       (aset res 0 file-name)
+                       res))]
     (Paths/get path-name file-array)))
 
 ;; ======================= Buffer utils ==========================================
