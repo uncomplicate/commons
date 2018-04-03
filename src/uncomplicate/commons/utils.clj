@@ -94,6 +94,14 @@
        ~form
        (throw (~error-fn status# ~(pr-str form))))))
 
+;; ======================= Messages ===============================================
+
+(defn dragan-says-ex
+  ([message data]
+   (throw (ex-info (format "Dragan says: %s" message) data)))
+  ([message]
+   (dragan-says-ex message {})))
+
 ;; ======================= Conditional into =======================================
 
 (defn cond-into
