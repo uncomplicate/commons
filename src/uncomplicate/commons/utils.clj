@@ -107,7 +107,7 @@
   (let [file-array (if file-names
                      (into-array String (cons file-name file-names))
                      (let [res (make-array String 1)]
-                       (aset res 0 file-name)
+                       (aset ^"[Ljava.lang.String;" res 0 file-name)
                        res))]
     (Paths/get path-name file-array)))
 
