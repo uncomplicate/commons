@@ -22,15 +22,30 @@
   (release [this]
     "Releases the resource held by this."))
 
+(defprotocol Info
+  (info [this] [this info-type]))
+
 (extend-type java.lang.Object
   Releaseable
   (release [_]
-    true))
+    true)
+  Info
+  (info
+    ([this]
+     (str this))
+    ([this _]
+     (str this))))
 
 (extend-type nil
   Releaseable
   (release [_]
-    true))
+    true)
+  Info
+  (info
+    ([this]
+     :nil)
+    ([this _]
+     :nil)))
 
 (extend-type clojure.lang.IAtom
   Releaseable
