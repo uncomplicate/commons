@@ -98,8 +98,7 @@
                                 (with-release ~(subvec bindings 2) ~@body)
                                 (finally
                                   (release ~(bindings 0)))))
-    :else (throw (IllegalArgumentException.
-                  "with-release only allows Symbols in bindings"))))
+    :else (throw (IllegalArgumentException. "with-release only allows Symbols in bindings"))))
 
 (defmacro let-release
   "Binds Releasable elements to symbols (like let do), evaluates
@@ -128,8 +127,7 @@
                                   (do
                                     (release ~(bindings 0))
                                     (throw e#)))))
-    :else (throw (IllegalArgumentException.
-                  "try-release only allows Symbols in bindings"))))
+    :else (throw (IllegalArgumentException. "try-release only allows Symbols in bindings"))))
 
 (defprotocol Mappable
   (mmap [this] [this flags])

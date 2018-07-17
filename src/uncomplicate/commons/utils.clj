@@ -140,3 +140,27 @@
       (.slice res)
       (.order res)
       res)))
+
+(defn put-float [^ByteBuffer b ^long i ^double x]
+  (.putFloat b (* Float/BYTES i) x))
+
+(defn get-float [^ByteBuffer b ^long i]
+  (.getFloat b (* Float/BYTES i)))
+
+(defn put-double [^ByteBuffer b ^long i ^double x]
+  (.putDouble b (* Double/BYTES i) x))
+
+(defn get-double [^ByteBuffer b ^long i]
+  (.getDouble b (* Double/BYTES i)))
+
+(defn put-long [^ByteBuffer b ^long i ^long x]
+  (.putLong b (* Long/BYTES i) x))
+
+(defn get-long [^ByteBuffer b ^long i]
+  (.getLong b (* Long/BYTES i)))
+
+(defn put-int [^ByteBuffer b ^long i ^long x]
+  (.putInt b (* Integer/BYTES i) x))
+
+(defn get-int [^ByteBuffer b ^long i]
+  (.getInt b (* Integer/BYTES i)))
