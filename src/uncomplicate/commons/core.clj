@@ -147,7 +147,6 @@
 (defn wrap-double ^doubles [^double x]
   (doto (double-array 1) (aset 0 x)))
 
-
 ;; ==================== Primitive function builders =====================
 
 (defmacro double-fn [f]

@@ -102,6 +102,11 @@
   ([message]
    (dragan-says-ex message {})))
 
+;; ======================= Keyword options encoding =================================
+
+(defn enc-keyword [kw-map kw]
+  (kw-map kw (dragan-says-ex (format "keyword %s is not applicable." kw) {:available (keys kw-map)})))
+
 ;; ======================= Conditional into =======================================
 
 (defn cond-into
@@ -120,11 +125,6 @@
     (Paths/get path-name file-array)))
 
 ;; ======================= Buffer utils ==========================================
-
-(defn buffer [^long size]
-  (let [buff (ByteBuffer/allocateDirect size)]
-    (.order ^ByteBuffer buff (ByteOrder/nativeOrder))
-    buff))
 
 (defn direct-buffer [^long size]
   (let [buff (ByteBuffer/allocateDirect size)]
