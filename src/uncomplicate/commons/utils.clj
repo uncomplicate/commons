@@ -105,7 +105,8 @@
 ;; ======================= Keyword options encoding =================================
 
 (defn enc-keyword [kw-map kw]
-  (kw-map kw (dragan-says-ex (format "keyword %s is not applicable." kw) {:available (keys kw-map)})))
+  (or (kw-map kw)
+      (dragan-says-ex (format "keyword %s is not applicable." kw) {:applicable (keys kw-map)})))
 
 ;; ======================= Conditional into =======================================
 
@@ -141,26 +142,29 @@
       (.order res)
       res)))
 
+(defn capacity ^long [^ByteBuffer b]
+  (.capacity b))
+
 (defn put-float [^ByteBuffer b ^long i ^double x]
   (.putFloat b (* Float/BYTES i) x))
 
-(defn get-float [^ByteBuffer b ^long i]
+(defn get-float ^double [^ByteBuffer b ^long i]
   (.getFloat b (* Float/BYTES i)))
 
 (defn put-double [^ByteBuffer b ^long i ^double x]
   (.putDouble b (* Double/BYTES i) x))
 
-(defn get-double [^ByteBuffer b ^long i]
+(defn get-double ^double [^ByteBuffer b ^long i]
   (.getDouble b (* Double/BYTES i)))
 
 (defn put-long [^ByteBuffer b ^long i ^long x]
   (.putLong b (* Long/BYTES i) x))
 
-(defn get-long [^ByteBuffer b ^long i]
+(defn get-long ^long [^ByteBuffer b ^long i]
   (.getLong b (* Long/BYTES i)))
 
 (defn put-int [^ByteBuffer b ^long i ^long x]
   (.putInt b (* Integer/BYTES i) x))
 
-(defn get-int [^ByteBuffer b ^long i]
+(defn get-int ^long [^ByteBuffer b ^long i]
   (.getInt b (* Integer/BYTES i)))
