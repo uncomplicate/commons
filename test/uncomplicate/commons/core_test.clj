@@ -34,4 +34,16 @@
 
 (facts "Test Cleaner."
        (let [direct-buffer (java.nio.ByteBuffer/allocateDirect 8)]
+         (release direct-buffer) => true)
+
+       (let [direct-buffer (.asFloatBuffer (java.nio.ByteBuffer/allocateDirect 8))]
+         (release direct-buffer) => true)
+
+       (let [direct-buffer (.asDoubleBuffer (java.nio.ByteBuffer/allocateDirect 8))]
+         (release direct-buffer) => true)
+
+       (let [direct-buffer (.asLongBuffer (java.nio.ByteBuffer/allocateDirect 8))]
+         (release direct-buffer) => true)
+
+       (let [direct-buffer (.asIntBuffer (java.nio.ByteBuffer/allocateDirect 8))]
          (release direct-buffer) => true))

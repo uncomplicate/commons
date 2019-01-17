@@ -8,7 +8,8 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.core
-  (:import [java.nio ByteBuffer DirectByteBuffer]))
+  (:import [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
+            DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU]))
 
 ;; ===================== Releaseable =================================
 
@@ -66,6 +67,38 @@
   (release [this]
     (when (.isDirect this)
       (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
+        (.clean cleaner)))
+    true))
+
+(extend-type FloatBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectFloatBufferU this)]
+        (.clean cleaner)))
+    true))
+
+(extend-type DoubleBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectDoubleBufferU this)]
+        (.clean cleaner)))
+    true))
+
+(extend-type IntBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectIntBufferU this)]
+        (.clean cleaner)))
+    true))
+
+(extend-type LongBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectLongBufferU this)]
         (.clean cleaner)))
     true))
 
