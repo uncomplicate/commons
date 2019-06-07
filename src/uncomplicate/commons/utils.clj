@@ -9,6 +9,7 @@
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.utils
   (:import java.nio.file.Paths
+           java.security.SecureRandom
            [java.nio ByteBuffer DirectByteBuffer ByteOrder]))
 
 ;; ========= Bitfild masks ========================================
@@ -168,3 +169,9 @@
 
 (defn get-int ^long [^ByteBuffer b ^long i]
   (.getInt b (* Integer/BYTES i)))
+
+;;====================== RNG Utils ===============================================
+
+(let [srng (SecureRandom.)]
+  (defn generate-seed ^long []
+    (.getLong (ByteBuffer/wrap (.generateSeed srng Long/BYTES)) 0)))
