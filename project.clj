@@ -7,7 +7,7 @@
 ;;   You must not remove this notice, or any other, from this software.
 
 (defproject uncomplicate/commons "0.8.0-SNAPSHOT"
-  :description "Common Uncomplicate utillities."
+  :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
         :url "https://github.com/uncomplicate/commons"}

@@ -8,13 +8,14 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.utils
-  (:import java.nio.file.Paths
-           java.security.SecureRandom
-           [java.nio ByteBuffer DirectByteBuffer ByteOrder]))
+  (:import java.security.SecureRandom
+           [java.nio ByteBuffer DirectByteBuffer ByteOrder]
+           [java.nio.file Paths Files FileVisitOption]
+           java.nio.file.attribute.FileAttribute))
 
 ;; ========= Bitfild masks ========================================
 
-(defn mask
+o(defn mask
   "Converts keywords to a bitfield mask.
 
   Given one or more keyword `flag`s, creates a long bitmask
@@ -126,6 +127,14 @@
                        res))]
     (Paths/get path-name file-array)))
 
+(defn create-temp-dir [prefix]
+  (java.nio.file.Files/createTempDirectory (or prefix "uncomplicate_") (make-array FileAttribute 0)))
+
+(defn delete [path]
+  (let [options (make-array FileVisitOption 0)]
+    (doseq [path (reverse (iterator-seq (.iterator (Files/walk path options))))]
+      (Files/deleteIfExists path))))
+
 ;; ======================= Buffer utils ==========================================
 
 (defn direct-buffer [^long size]
@@ -175,3 +184,10 @@
 (let [srng (SecureRandom.)]
   (defn generate-seed ^long []
     (.getLong (ByteBuffer/wrap (.generateSeed srng Long/BYTES)) 0)))
+
+;; ===================== Work Groups utilities ===================================
+
+(defn count-groups ^long [^long per-group ^long items]
+  (if (< per-group items)
+    (quot (+ items (dec per-group)) per-group)
+    1))

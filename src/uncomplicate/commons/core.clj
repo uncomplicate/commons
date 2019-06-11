@@ -52,7 +52,7 @@
   Releaseable
   (release [this]
     (let [res (release @this)]
-      (swap! this nil)
+      (reset! this nil)
       res)))
 
 (extend-type clojure.lang.Sequential
