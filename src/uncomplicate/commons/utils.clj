@@ -15,7 +15,7 @@
 
 ;; ========= Bitfild masks ========================================
 
-o(defn mask
+(defn mask
   "Converts keywords to a bitfield mask.
 
   Given one or more keyword `flag`s, creates a long bitmask
