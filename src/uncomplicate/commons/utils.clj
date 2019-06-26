@@ -81,7 +81,7 @@
 ;; ====================== Error checking ==========================================
 
 (defmacro with-check
-  "Evaluates `form` if `status` is not zero (e.g. `CL_SUCCESS`), otherwise throws
+  "Evaluates `form` if `status` is zero (e.g. `CL_SUCCESS`), otherwise throws
   an appropriate `ExceptionInfo` with decoded informative details.
   It helps with native interop methods that return error codes directly, while
   returning computation results through side-effects in arguments.
