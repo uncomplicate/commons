@@ -207,3 +207,19 @@
       (~f x# y# z#))
      (^long [^long x# ^long y# ^long z# ^long v#]
       (~f x# y# z# v#))))
+
+;; =================== Wrappers ==========================
+
+(defprotocol Wrapper
+  (extract [this]))
+
+(defprotocol Wrappable
+  (wrap [this]))
+
+(extend-type nil
+  Wrapper
+  (extract [_]
+    nil)
+  Wrappable
+  (wrap [this]
+    nil))
