@@ -182,8 +182,11 @@
 ;;====================== RNG Utils ===============================================
 
 (let [srng (SecureRandom.)]
-  (defn generate-seed ^long []
+  (defn generate-secure-seed ^long []
     (.getLong (ByteBuffer/wrap (.generateSeed srng Long/BYTES)) 0)))
+
+(defn generate-seed ^long []
+  (- (long (rand Long/MAX_VALUE)) (quot Long/MAX_VALUE 2)))
 
 ;; ===================== Work Groups utilities ===================================
 

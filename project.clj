@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.9.0"
+(defproject uncomplicate/commons "0.10.0-SNAPSHOT"
   :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
