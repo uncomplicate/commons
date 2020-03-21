@@ -8,10 +8,12 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.utils
+  (:require [uncomplicate.commons.core :refer [Mappable mmap unmap]])
   (:import java.security.SecureRandom
            [java.nio ByteBuffer DirectByteBuffer ByteOrder]
            [java.nio.file Paths Files FileVisitOption]
-           java.nio.file.attribute.FileAttribute))
+           java.nio.file.attribute.FileAttribute
+           [java.nio.channels FileChannel FileChannel$MapMode]))
 
 ;; ========= Bitfild masks ========================================
 
@@ -32,11 +34,11 @@
       (mask {:a 1 :b 2 :c 4} :a :c []) => 5
   "
   (^long [table flag1 flag2 flags]
-         (apply bit-or (table flag1) (table flag2) (map table flags)))
+   (apply bit-or (table flag1) (table flag2) (map table flags)))
   (^long [table flag flags]
-         (apply bit-or 0 (table flag) (map table flags)))
+   (apply bit-or 0 (table flag) (map table flags)))
   (^long [table flags]
-         (apply bit-or 0 0 (map table flags))))
+   (apply bit-or 0 0 (map table flags))))
 
 (defn unmask
   "Converts a bitfield `mask` to keywords.
@@ -74,8 +76,8 @@
   (some identity
         (map (fn [[k v]]
                (if (= 0 (bit-and mask ^long v))
-                   nil
-                   k))
+                 nil
+                 k))
              table)))
 
 ;; ====================== Error checking ==========================================
@@ -178,6 +180,39 @@
 
 (defn get-int ^long [^ByteBuffer b ^long i]
   (.getInt b (* Integer/BYTES i)))
+
+(defn put-short [^ByteBuffer b ^long i ^long x]
+  (.putShort b (* Short/BYTES i) x))
+
+(defn get-short ^long [^ByteBuffer b ^long i]
+  (long (.getShort b (* Short/BYTES i))))
+
+(defn put-short [^ByteBuffer b ^long i ^long x]
+  (.put b i x))
+
+(defn get-short ^long [^ByteBuffer b ^long i]
+  (long (.get b i)))
+
+(defn mapped-buffer
+  ([^FileChannel channel ^long offset ^long size flag]
+   (doto (.map channel
+               (case flag
+                 :read-write FileChannel$MapMode/READ_WRITE
+                 :read FileChannel$MapMode/READ_ONLY
+                 :read-only FileChannel$MapMode/READ_ONLY
+                 :private FileChannel$MapMode/PRIVATE
+                 :copy-on-write FileChannel$MapMode/PRIVATE
+                 (dragan-says-ex "The requested flag is not supported by java.nio.FileChannel." {:flag flag}))
+               (max 0 offset) size)
+     (.order ^ByteBuffer (ByteOrder/nativeOrder))))
+  ([^FileChannel channel ^long size flag]
+   (mapped-buffer channel 0 size flag))
+  ([^FileChannel channel size-or-flag]
+   (if (keyword? size-or-flag)
+     (mapped-buffer channel 0 (.size channel) size-or-flag)
+     (mapped-buffer channel 0 size-or-flag :private)))
+  ([^FileChannel channel]
+   (mapped-buffer channel 0 (.size channel) :private)))
 
 ;;====================== RNG Utils ===============================================
 
