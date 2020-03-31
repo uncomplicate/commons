@@ -10,8 +10,10 @@
     uncomplicate.commons.utils
   (:require [uncomplicate.commons.core :refer [Mappable mmap unmap]])
   (:import java.security.SecureRandom
-           [java.nio ByteBuffer DirectByteBuffer ByteOrder]
-           [java.nio.file Paths Files FileVisitOption]
+           java.io.RandomAccessFile
+           java.net.URI
+           [java.nio ByteBuffer DirectByteBuffer ByteOrder ShortBuffer IntBuffer LongBuffer]
+           [java.nio.file Path Paths Files FileVisitOption OpenOption StandardOpenOption]
            java.nio.file.attribute.FileAttribute
            [java.nio.channels FileChannel FileChannel$MapMode]))
 
@@ -210,9 +212,61 @@
   ([^FileChannel channel size-or-flag]
    (if (keyword? size-or-flag)
      (mapped-buffer channel 0 (.size channel) size-or-flag)
-     (mapped-buffer channel 0 size-or-flag :private)))
+     (mapped-buffer channel 0 size-or-flag :read-write)))
   ([^FileChannel channel]
-   (mapped-buffer channel 0 (.size channel) :private)))
+   (mapped-buffer channel 0 (.size channel) :read-write)))
+
+(defn reverse-short-bytes [^ByteBuffer buffer!]
+  (let [b (.asShortBuffer buffer!)]
+    (dotimes [i (.capacity b)]
+      (.put b i (Short/reverseBytes (.get b i))))
+    buffer!))
+
+(defn reverse-int-bytes [^ByteBuffer buffer!]
+  (let [b (.asIntBuffer buffer!)]
+    (dotimes [i (.capacity b)]
+      (.put b i (Integer/reverseBytes (.get b i))))
+    buffer!))
+
+(defn reverse-long-bytes [^ByteBuffer buffer!]
+  (let [b (.asLongBuffer buffer!)]
+    (dotimes [i (.capacity b)]
+      (.put b i (Long/reverseBytes (.get b i))))
+    buffer!))
+
+(defn dec-open-option [option]
+  (case option
+    :read StandardOpenOption/READ
+    :write StandardOpenOption/WRITE
+    :append StandardOpenOption/APPEND
+    :truncate StandardOpenOption/TRUNCATE_EXISTING
+    :truncate-existing StandardOpenOption/TRUNCATE_EXISTING
+    :create StandardOpenOption/CREATE
+    :create-new StandardOpenOption/CREATE_NEW
+    :delete-on-close StandardOpenOption/DELETE_ON_CLOSE
+    :sparse StandardOpenOption/SPARSE
+    :sync StandardOpenOption/SYNC
+    :dsync StandardOpenOption/DSYNC
+    (dragan-says-ex "The requested option is not supported by java's StandardOpenOption." {:option option})))
+
+(defn channel
+  ([^RandomAccessFile file]
+   (.getChannel file))
+  ([p options]
+   (cond
+     (instance? Path p)
+     (FileChannel/open p (into-array OpenOption (map dec-open-option options)))
+     (instance? URI p) (channel (Paths/get p) options)
+     :other (channel (Paths/get (URI. p)) options))))
+
+(defn random-access
+  ([^String path flag]
+   (RandomAccessFile. path (case flag
+                             :read-write "rw"
+                             :read "r"
+                             (name flag))))
+  ([^String path]
+   (RandomAccessFile. path "rw")))
 
 ;;====================== RNG Utils ===============================================
 

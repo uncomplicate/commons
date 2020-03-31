@@ -169,10 +169,10 @@
 ;; =================== Array wrappers ==================================
 
 (defn wrap-byte ^bytes [^long x]
-  (doto (byte-array 1) (aset 0 x)))
+  (doto (byte-array 1) (aset 0 (byte x))))
 
 (defn wrap-short ^shorts [^long x]
-  (doto (short-array 1) (aset 0 x)))
+  (doto (short-array 1) (aset 0 (short x))))
 
 (defn wrap-int ^ints [^long x]
   (doto (int-array 1) (aset 0 x)))
