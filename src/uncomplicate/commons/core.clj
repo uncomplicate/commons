@@ -11,6 +11,22 @@
   (:import [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
             DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU]))
 
+;; =================== Viewable ========================================
+
+(defprotocol Viewable
+  "Attach a default dense structure to the raw data of `x`. `x` can be anything that implements
+  Viewable, such as DirectByteBuffer.
+
+  Changes to the resulting object affect the source `x`, even the parts of data that might not
+  be accessible by `x`. Use with caution!
+
+  view always creates a new instance that reuses the master's data,
+  but releasing a view never releases the master data.
+
+      (view (buffer (vctr float-factory 1 2 3)))
+  "
+  (view [this]))
+
 ;; ===================== Releaseable =================================
 
 (defprotocol Releaseable
@@ -30,6 +46,9 @@
   Releaseable
   (release [_]
     true)
+  Viewable
+  (view [this]
+    this)
   Info
   (info
     ([this]
@@ -41,6 +60,9 @@
   Releaseable
   (release [_]
     true)
+  Viewable
+  (view [_]
+    nil)
   Info
   (info
     ([this]
@@ -165,22 +187,6 @@
 (defprotocol Mappable
   (mmap [this] [this flags])
   (unmap [this mapped]))
-
-;; =================== Viewable ========================================
-
-(defprotocol Viewable
-  "Attach a default dense structure to the raw data of `x`. `x` can be anything that implements
-  Viewable, such as DirectByteBuffer.
-
-  Changes to the resulting object affect the source `x`, even the parts of data that might not
-  be accessible by `x`. Use with caution!
-
-  view always creates a new instance that reuses the master's data,
-  but releasing a view never releases the master data.
-
-      (view (buffer (vctr float-factory 1 2 3)))
-  "
-  (view [this]))
 
 ;; =================== Array wrappers ==================================
 
