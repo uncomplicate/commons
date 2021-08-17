@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.13.0-SNAPSHOT"
+(defproject uncomplicate/commons "0.12.1"
            :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
@@ -27,7 +27,6 @@
                                  *print-length* 128}
                    :dependencies [[midje "1.10.4"]]
                    :jvm-opts ^:replace ["-Dclojure.compiler.direct-linking=true"
-                                        "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"
-                                        "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED"]}}
+                                        #_"--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"]}}
 
   :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"])

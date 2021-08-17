@@ -87,7 +87,9 @@
 (extend-type ByteBuffer
   Releaseable
   (release [this]
-    (.invokeCleaner (jdk.internal.misc.Unsafe/getUnsafe) this)
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
+        (.clean cleaner)))
     true))
 
 (extend-type FloatBuffer
