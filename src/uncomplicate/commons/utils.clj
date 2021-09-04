@@ -189,10 +189,10 @@
 (defn get-short ^long [^ByteBuffer b ^long i]
   (long (.getShort b (* Short/BYTES i))))
 
-(defn put-short [^ByteBuffer b ^long i ^long x]
-  (.put b i x))
+(defn put-byte [^ByteBuffer b ^long i ^long x]
+  (.put b i (byte x)))
 
-(defn get-short ^long [^ByteBuffer b ^long i]
+(defn get-byte ^long [^ByteBuffer b ^long i]
   (long (.get b i)))
 
 (defn mapped-buffer
