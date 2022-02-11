@@ -30,9 +30,32 @@
 
 ;; ===================== AutoCloseable ===============================
 
-(defn close! [^AutoCloseable closeable]
-  (.close closeable)
-  closeable)
+(defprotocol Closeable
+  (close! [this]
+    "Closes this."))
+
+(extend-type AutoCloseable
+  Closeable
+  (close! [closeable]
+    (.close closeable)
+    closeable))
+
+(extend-type clojure.lang.Sequential
+  Closeable
+  (close! [s]
+    (doseq [e s]
+      (close! e))
+    true))
+
+(extend-type java.util.Collection
+  Closeable
+  (close! [coll]
+    (doseq [e coll]
+      (close! e))
+    true))
+
+(defn closeable? [this]
+  (instance? Closeable this))
 
 ;; ===================== Releaseable =================================
 
@@ -87,8 +110,15 @@
 (extend-type clojure.lang.Sequential
   Releaseable
   (release [this]
-    (doseq [r this]
-      (release r))
+    (doseq [e this]
+      (release e))
+    true))
+
+(extend-type java.util.Collection
+  Releaseable
+  (release [coll]
+    (doseq [e coll]
+      (release e))
     true))
 
 (extend-type ByteBuffer
