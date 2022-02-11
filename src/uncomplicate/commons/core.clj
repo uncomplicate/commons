@@ -8,7 +8,8 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.core
-  (:import [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
+  (:import java.lang.AutoCloseable
+           [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
             DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU]))
 
 ;; =================== Viewable ========================================
@@ -26,6 +27,12 @@
       (view (buffer (vctr float-factory 1 2 3)))
   "
   (view [this]))
+
+;; ===================== AutoCloseable ===============================
+
+(defn close! [^AutoCloseable closeable]
+  (.close closeable)
+  closeable)
 
 ;; ===================== Releaseable =================================
 
