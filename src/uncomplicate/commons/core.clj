@@ -101,6 +101,12 @@
      :nil)))
 
 (extend-type clojure.lang.IAtom
+  Info
+  (info
+    ([this]
+     (info (deref this)))
+    ([this info-type]
+     (info (deref this) info-type)))
   Releaseable
   (release [this]
     (let [res (release @this)]
@@ -108,6 +114,12 @@
       res)))
 
 (extend-type clojure.lang.Sequential
+  Info
+  (info
+    ([this]
+     (map info this))
+    ([this info-type]
+     (map #(info % info-type) this)))
   Releaseable
   (release [this]
     (doseq [e this]
@@ -115,6 +127,12 @@
     true))
 
 (extend-type java.util.Collection
+  Info
+  (info
+    ([this]
+     (map info this))
+    ([this info-type]
+     (map #(info % info-type) this)))
   Releaseable
   (release [coll]
     (doseq [e coll]

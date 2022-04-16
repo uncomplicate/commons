@@ -6,14 +6,14 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.13.0-SNAPSHOT"
+(defproject uncomplicate/commons "0.13.0"
            :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
         :url "https://github.com/uncomplicate/commons"}
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.10.3"]]
+  :dependencies [[org.clojure/clojure "1.11.1"]]
 
   :codox {:src-dir-uri "http://github.com/uncomplicate/commons/blob/master/"
           :src-linenum-anchor-prefix "L"
