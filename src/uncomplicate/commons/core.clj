@@ -185,7 +185,7 @@
   (satisfies? Releaseable this))
 
 (defmacro with-release
-  "Binds Releasable elements to symbols (like let do), evaluates
+  "Binds Releasable elements to symbols (like let does), evaluates
   body, and at the end releases the resources held by the bindings. The bindings
   can also be deeply sequential (see examples) - they will be released properly.
 
@@ -211,7 +211,7 @@
     :else (throw (IllegalArgumentException. "with-release only allows Symbols in bindings"))))
 
 (defmacro let-release
-  "Binds Releasable elements to symbols (like let do), evaluates
+  "Binds Releasable elements to symbols (like let does), evaluates
   body, and, if any exception occures, releases the resources held by the bindings.
   The bindings can also be deeply sequential (see examples)
   - they will be released properly.
@@ -306,3 +306,11 @@
   Wrappable
   (wrap [this]
     nil))
+
+(extend-type Object
+  Wrapper
+  (extract [this]
+    this)
+  Wrappable
+  (wrap [this]
+    this))
