@@ -10,7 +10,8 @@
     uncomplicate.commons.core
   (:import java.lang.AutoCloseable
            [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
-            DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU]))
+            DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU ShortBuffer
+            CharBuffer Buffer]))
 
 ;; =================== Viewable ========================================
 
@@ -314,3 +315,251 @@
   Wrappable
   (wrap [this]
     this))
+
+;; ====================== Collections ==========================
+
+(defprotocol Entries
+  (sizeof* [entry])
+  (size* [this]))
+
+(defprotocol Bytes
+  (bytesize* [this]))
+
+(defn size ^long [x]
+  (long (size* x)))
+
+(defn sizeof ^long [x]
+  (long (sizeof* x)))
+
+(defn bytesize ^long [x]
+  (long (bytesize* x)))
+
+(extend-type nil
+  Bytes
+  (bytesize* [_]
+    0)
+  Entries
+  (sizeof* [_]
+    0)
+  (size* [_]
+    0))
+
+(extend-type Float
+  Bytes
+  (bytesize* [_]
+    Float/BYTES)
+  Entries
+  (sizeof* [_]
+    Double/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Double
+  Bytes
+  (bytesize* [_]
+    Double/BYTES)
+  Entries
+  (sizeof* [_]
+    Double/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Integer
+  Bytes
+  (bytesize* [_]
+    Integer/BYTES)
+  Entries
+  (sizeof* [_]
+    Integer/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Long
+  Bytes
+  (bytesize* [_]
+    Long/BYTES)
+  Entries
+  (sizeof* [_]
+    Long/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Short
+  Bytes
+  (bytesize* [_]
+    Short/BYTES)
+  Entries
+  (sizeof* [_]
+    Short/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Character
+  Bytes
+  (bytesize* [_]
+    Character/BYTES)
+  Entries
+  (sizeof* [_]
+    Character/BYTES)
+  (size* [_]
+    1))
+
+(extend-type Byte
+  Bytes
+  (bytesize* [_]
+    Byte/BYTES)
+  Entries
+  (sizeof* [_]
+    Byte/BYTES)
+  (size* [_]
+    1))
+
+(extend-type (Class/forName "[F")
+  Bytes
+  (bytesize* [this]
+    (* Float/BYTES (alength ^floats this)))
+  Entries
+  (sizeof* [_]
+    Float/BYTES)
+  (size* [this]
+    (alength ^floats this)))
+
+(extend-type (Class/forName "[D")
+  Bytes
+  (bytesize* [this]
+    (* Double/BYTES (alength ^doubles this)))
+  Entries
+  (sizeof* [_]
+    Double/BYTES)
+  (size* [this]
+    (alength ^floats this)))
+
+(extend-type (Class/forName "[I")
+  Bytes
+  (bytesize* [this]
+    (* Integer/BYTES (alength ^ints this)))
+  Entries
+  (sizeof* [_]
+    Integer/BYTES)
+  (size* [this]
+    (alength ^ints this)))
+
+(extend-type (Class/forName "[J")
+  Bytes
+  (bytesize* [this]
+    (* Long/BYTES (alength ^longs this)))
+  Entries
+  (sizeof* [_]
+    Long/BYTES)
+  (size* [this]
+    (alength ^longs this)))
+
+(extend-type (Class/forName "[S")
+  Bytes
+  (bytesize* [this]
+    (* Short/BYTES (alength ^shorts this)))
+  Entries
+  (sizeof* [_]
+    Short/BYTES)
+  (size* [this]
+    (alength ^shorts this)))
+
+(extend-type (Class/forName "[B")
+  Bytes
+  (bytesize* [this]
+    (alength ^bytes this))
+  Entries
+  (sizeof* [_]
+    Byte/BYTES)
+  (size* [this]
+    (alength ^bytes this)))
+
+(extend-type (Class/forName "[C")
+  Bytes
+  (bytesize* [this]
+    (* Character/BYTES (alength ^chars this)))
+  Entries
+  (sizeof* [_]
+    Character/BYTES)
+  (size* [this]
+    (alength ^chars this)))
+
+(extend-type Buffer
+  Bytes
+  (bytesize* [this]
+    (* (long (sizeof* this)) (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Byte/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type FloatBuffer
+  Bytes
+  (bytesize* [this]
+    (* Float/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Float/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type DoubleBuffer
+  Bytes
+  (bytesize* [this]
+    (* Double/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Double/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type IntBuffer
+  Bytes
+  (bytesize* [this]
+    (* Integer/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Integer/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type LongBuffer
+  Bytes
+  (bytesize* [this]
+    (* Long/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Long/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type ShortBuffer
+  Bytes
+  (bytesize* [this]
+    (* Short/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Short/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type CharBuffer
+  Bytes
+  (bytesize* [this]
+    (* Character/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Character/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(def ^:const types
+  {:double Double/TYPE
+   :float Float/TYPE
+   :int Integer/TYPE
+   :long Long/TYPE
+   :short Short/TYPE
+   :byte Byte/TYPE
+   :char Character/TYPE
+   :bool Boolean/TYPE})
