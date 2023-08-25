@@ -87,6 +87,20 @@
     ([this _]
      (str this))))
 
+(extend-type java.lang.Number
+  Releaseable
+  (release [_]
+    true)
+  Viewable
+  (view [this]
+    this)
+  Info
+  (info
+    ([this]
+     this)
+    ([this _]
+     this)))
+
 (extend-type nil
   Releaseable
   (release [_]
