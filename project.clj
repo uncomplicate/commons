@@ -15,17 +15,19 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.11.1"]]
 
-  :codox {:src-dir-uri "http://github.com/uncomplicate/commons/blob/master/"
-          :src-linenum-anchor-prefix "L"
-          :output-path "docs/codox"}
-
   :profiles {:dev {:plugins [[lein-midje "3.2.1"]
-                             [lein-codox "0.10.7"]]
+                             [lein-codox "0.10.8"]
+                             [com.github.clj-kondo/lein-clj-kondo "0.2.5"]]
                    :global-vars {*warn-on-reflection* true
                                  *assert* true
                                  *unchecked-math* :warn-on-boxed
                                  *print-length* 128}
-                   :dependencies [[midje "1.10.9"]]
+                   :dependencies [[midje "1.10.9"]
+                                  [codox-theme-rdash "0.1.2"]]
+                   :codox {:metadata {:doc/format :markdown}
+                           :source-uri "http://github.com/uncomplicate/commons/blob/master/{filepath}#L{line}"
+                           :output-path "docs/codox"
+                           :themes [:rdash]}
                    :jvm-opts ^:replace ["-Dclojure.compiler.direct-linking=true"
                                         "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"
                                         "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]}}

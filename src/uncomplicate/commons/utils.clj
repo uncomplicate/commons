@@ -8,7 +8,6 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.utils
-  (:require [uncomplicate.commons.core :refer [Mappable mmap unmap]])
   (:import java.security.SecureRandom
            java.io.RandomAccessFile
            java.net.URI

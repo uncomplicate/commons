@@ -8,191 +8,109 @@
 
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.core
-  (:import java.lang.AutoCloseable
-           [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer DirectByteBuffer
-            DirectFloatBufferU DirectDoubleBufferU DirectLongBufferU DirectIntBufferU ShortBuffer
-            CharBuffer Buffer]))
+  "Core Uncomplicate functions useful across all projects.
+  "
+  (:import java.util.Collection
+           [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer ShortBuffer
+            CharBuffer Buffer DirectByteBuffer DirectFloatBufferU DirectDoubleBufferU
+            DirectLongBufferU DirectIntBufferU DirectShortBufferU DirectCharBufferU]
+           [clojure.lang Sequential AReference Atom Ref]))
 
-;; =================== Viewable ========================================
+(def ^{:const true
+       :doc "Available mappings from keywords to Java primitive types."}
+  types
+  {:double Double/TYPE
+   :float Float/TYPE
+   :int Integer/TYPE
+   :long Long/TYPE
+   :short Short/TYPE
+   :byte Byte/TYPE
+   :char Character/TYPE
+   :bool Boolean/TYPE})
+
+(defmacro double-fn
+  "Wraps a function into a primitive type-annotated function (to satisfy the compiler in some cases)."
+  [f]
+  `(fn
+     (^double []
+      (~f))
+     (^double [^double x#]
+      (~f x#))
+     (^double [^double x# ^double y#]
+      (~f x# y#))
+     (^double [^double x# ^double y# ^double z#]
+      (~f x# y# z#))
+     (^double [^double x# ^double y# ^double z# ^double v#]
+      (~f x# y# z# v#))))
+
+(defmacro long-fn
+  "Wraps a function into a primitive type-annotated function (to satisfy the compiler in some cases)."
+  [f]
+  `(fn
+     (^long []
+      (~f))
+     (^long [^long x#]
+      (~f x#))
+     (^long [^long x# ^long y#]
+      (~f x# y#))
+     (^long [^long x# ^long y# ^long z#]
+      (~f x# y# z#))
+     (^long [^long x# ^long y# ^long z# ^long v#]
+      (~f x# y# z# v#))))
 
 (defprotocol Viewable
   "Attach a default dense structure to the raw data of `x`. `x` can be anything that implements
-  Viewable, such as DirectByteBuffer.
-
-  Changes to the resulting object affect the source `x`, even the parts of data that might not
+  Viewable, such as `DirectByteBuffer`, `Pointer`, vector, matrix, tensor, Java object etc.
+  The default implementation just returns the object itself.
+  Changes to the resulting object can affect the source `x`, even the parts of data that might not
   be accessible by `x`. Use with caution!
-
-  view always creates a new instance that reuses the master's data,
-  but releasing a view never releases the master data.
-
-      (view (buffer (vctr float-factory 1 2 3)))
+  Typically creates a new instance that reuses the master's data, but releasing a view should
+  never release the master data.
+  Many code examples are available throughout Uncomplicate libraries.
   "
-  (view [this]))
+  (view [this] "Views this through new managing instance."))
 
-;; ===================== AutoCloseable ===============================
+(defprotocol Info
+  "Object that can provide detailed information maps."
+  (info [this] [this info-type] "Provide all available information, or, spicific information if the corresponding `info-type` key is provided."))
 
-(defprotocol Closeable
-  (close! [this]
-    "Closes this."))
+(defprotocol Mappable
+  "Objects whose memory can be mapped or unmapped."
+  (mmap [this] [this flags] "Map this object.")
+  (unmap [this mapped] "Unmap this object."))
 
-(extend-type AutoCloseable
-  Closeable
-  (close! [closeable]
-    (.close closeable)
-    closeable))
+(defprotocol Entries
+  "Object that holds data that has total size in number of entries and size of one entry in bytes."
+  (sizeof* [entry] "Size of one data entry in bytes.")
+  (size* [this] "Number of entries in data."))
 
-(extend-type clojure.lang.Sequential
-  Closeable
-  (close! [s]
-    (doseq [e s]
-      (close! e))
-    true))
+(defprotocol Bytes
+  "Object that has size in bytes."
+  (bytesize* [this] "The size of this object's data in bytes."))
 
-(extend-type java.util.Collection
-  Closeable
-  (close! [coll]
-    (doseq [e coll]
-      (close! e))
-    true))
+(defn size
+  "The size of `x`'s data in number of entries."
+  ^long [x]
+  (long (size* x)))
 
-(defn closeable? [this]
-  (instance? Closeable this))
+(defn sizeof
+  "The size of one data entry of `x`'s data in bytes."
+  ^long [x]
+  (long (sizeof* x)))
 
-;; ===================== Releaseable =================================
+(defn bytesize
+  "The size of `x`'s data in bytes."
+  ^long [x]
+  (long (bytesize* x)))
 
 (defprotocol Releaseable
   "Objects that hold resources that can be released after use. For OpenCL
-  objects, releasing  means decrementing the reference count of the object.
-
+  objects, releasing means decrementing the reference count of the object.
+  Pointers call JavaCPP deallocators, Vectors and matrices call `free!`, etc.
   The errors should be signalled by throwing an exception rather than
   by the return value.
   "
-  (release [this]
-    "Releases the resource held by this."))
-
-(defprotocol Info
-  (info [this] [this info-type]))
-
-(extend-type java.lang.Object
-  Releaseable
-  (release [_]
-    true)
-  Viewable
-  (view [this]
-    this)
-  Info
-  (info
-    ([this]
-     (str this))
-    ([this _]
-     (str this))))
-
-(extend-type java.lang.Number
-  Releaseable
-  (release [_]
-    true)
-  Viewable
-  (view [this]
-    this)
-  Info
-  (info
-    ([this]
-     this)
-    ([this _]
-     this)))
-
-(extend-type nil
-  Releaseable
-  (release [_]
-    true)
-  Viewable
-  (view [_]
-    nil)
-  Info
-  (info
-    ([this]
-     :nil)
-    ([this _]
-     :nil)))
-
-(extend-type clojure.lang.IAtom
-  Info
-  (info
-    ([this]
-     (info (deref this)))
-    ([this info-type]
-     (info (deref this) info-type)))
-  Releaseable
-  (release [this]
-    (let [res (release @this)]
-      (reset! this nil)
-      res)))
-
-(extend-type clojure.lang.Sequential
-  Info
-  (info
-    ([this]
-     (map info this))
-    ([this info-type]
-     (map #(info % info-type) this)))
-  Releaseable
-  (release [this]
-    (doseq [e this]
-      (release e))
-    true))
-
-(extend-type java.util.Collection
-  Info
-  (info
-    ([this]
-     (map info this))
-    ([this info-type]
-     (map #(info % info-type) this)))
-  Releaseable
-  (release [coll]
-    (doseq [e coll]
-      (release e))
-    true))
-
-(extend-type ByteBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
-        (.clean cleaner)))
-    true))
-
-(extend-type FloatBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectFloatBufferU this)]
-        (.clean cleaner)))
-    true))
-
-(extend-type DoubleBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectDoubleBufferU this)]
-        (.clean cleaner)))
-    true))
-
-(extend-type IntBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectIntBufferU this)]
-        (.clean cleaner)))
-    true))
-
-(extend-type LongBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectLongBufferU this)]
-        (.clean cleaner)))
-    true))
+  (release [this] "Releases all resources held by this object."))
 
 (defn releaseable?
   "Checks whether this is releaseable (in terms of Releaseable protocol)."
@@ -200,9 +118,9 @@
   (satisfies? Releaseable this))
 
 (defmacro with-release
-  "Binds Releasable elements to symbols (like let does), evaluates
-  body, and at the end releases the resources held by the bindings. The bindings
-  can also be deeply sequential (see examples) - they will be released properly.
+  "Binds Releasable elements to symbols (like `let` does), evaluates `body`,
+  and eventually releases the resources held by the bindings. The bindings can also
+  be deeply sequential (see examples) - they should be released properly.
 
   Example:
 
@@ -226,10 +144,9 @@
     :else (throw (IllegalArgumentException. "with-release only allows Symbols in bindings"))))
 
 (defmacro let-release
-  "Binds Releasable elements to symbols (like let does), evaluates
-  body, and, if any exception occures, releases the resources held by the bindings.
-  The bindings can also be deeply sequential (see examples)
-  - they will be released properly.
+  "Binds Releasable elements to symbols (like `let` does), evaluates `body`,  and, if any exception
+  occures, releases the resources held by the bindings. The bindings can also be deeply sequential
+  (see examples) - they should be released properly.
 
   Example:
 
@@ -254,101 +171,47 @@
                                     (throw e#)))))
     :else (throw (IllegalArgumentException. "try-release only allows Symbols in bindings"))))
 
-(defprotocol Mappable
-  (mmap [this] [this flags])
-  (unmap [this mapped]))
-
-;; =================== Array wrappers ==================================
-
-(defn wrap-byte ^bytes [^long x]
-  (doto (byte-array 1) (aset 0 (byte x))))
-
-(defn wrap-short ^shorts [^long x]
-  (doto (short-array 1) (aset 0 (short x))))
-
-(defn wrap-int ^ints [^long x]
-  (doto (int-array 1) (aset 0 x)))
-
-(defn wrap-long ^longs [^long x]
-  (doto (long-array 1) (aset 0 x)))
-
-(defn wrap-float ^floats [^double x]
-  (doto (float-array 1) (aset 0 x)))
-
-(defn wrap-double ^doubles [^double x]
-  (doto (double-array 1) (aset 0 x)))
-
-;; ==================== Primitive function builders =====================
-
-(defmacro double-fn [f]
-  `(fn
-     (^double []
-      (~f))
-     (^double [^double x#]
-      (~f x#))
-     (^double [^double x# ^double y#]
-      (~f x# y#))
-     (^double [^double x# ^double y# ^double z#]
-      (~f x# y# z#))
-     (^double [^double x# ^double y# ^double z# ^double v#]
-      (~f x# y# z# v#))))
-
-(defmacro long-fn [f]
-  `(fn
-     (^long []
-      (~f))
-     (^long [^long x#]
-      (~f x#))
-     (^long [^long x# ^long y#]
-      (~f x# y#))
-     (^long [^long x# ^long y# ^long z#]
-      (~f x# y# z#))
-     (^long [^long x# ^long y# ^long z# ^long v#]
-      (~f x# y# z# v#))))
-
-;; =================== Wrappers ==========================
-
-(defprotocol Wrapper
-  (extract [this]))
-
-(defprotocol Wrappable
-  (wrap [this]))
-
-(extend-type nil
-  Wrapper
-  (extract [_]
-    nil)
-  Wrappable
-  (wrap [this]
-    nil))
-
 (extend-type Object
-  Wrapper
-  (extract [this]
+  Viewable
+  (view [this]
     this)
-  Wrappable
-  (wrap [this]
-    this))
+  Info
+  (info
+    ([this]
+     (str this))
+    ([this _]
+     (str this)))
+  Releaseable
+  (release [_]
+    true))
 
-;; ====================== Collections ==========================
-
-(defprotocol Entries
-  (sizeof* [entry])
-  (size* [this]))
-
-(defprotocol Bytes
-  (bytesize* [this]))
-
-(defn size ^long [x]
-  (long (size* x)))
-
-(defn sizeof ^long [x]
-  (long (sizeof* x)))
-
-(defn bytesize ^long [x]
-  (long (bytesize* x)))
+(extend-type Number
+  Releaseable
+  (release [_]
+    true)
+  Viewable
+  (view [this]
+    this)
+  Info
+  (info
+    ([this]
+     this)
+    ([this _]
+     this)))
 
 (extend-type nil
+  Releaseable
+  (release [_]
+    true)
+  Viewable
+  (view [_]
+    nil)
+  Info
+  (info
+    ([_]
+     nil)
+    ([_ _]
+     nil))
   Bytes
   (bytesize* [_]
     0)
@@ -357,6 +220,176 @@
     0)
   (size* [_]
     0))
+
+(extend-type AReference
+  Info
+  (info
+    ([this]
+     (info (deref this)))
+    ([this info-type]
+     (info (deref this) info-type))))
+
+(extend-type Atom
+  Releaseable
+  (release [this]
+    (let [res (release (deref this))]
+      (reset! this nil)
+      res)))
+
+(extend-type Ref
+  Releaseable
+  (release [this]
+    (let [res (release (deref this))]
+      (ref-set this nil)
+      res)))
+
+(extend-type Sequential
+  Info
+  (info
+    ([this]
+     (map info this))
+    ([this info-type]
+     (map #(info % info-type) this)))
+  Releaseable
+  (release [this]
+    (doseq [e this]
+      (release e))
+    true))
+
+(extend-type Collection
+  Info
+  (info
+    ([this]
+     (map info this))
+    ([this info-type]
+     (map #(info % info-type) this)))
+  Releaseable
+  (release [coll]
+    (doseq [e coll]
+      (release e))
+    true))
+
+(extend-type Buffer
+  Bytes
+  (bytesize* [this]
+    (* (long (sizeof* this)) (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Byte/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type ByteBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (.capacity this))
+  Entries
+  (sizeof* [_]
+    Byte/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type FloatBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectFloatBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Float/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Float/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type DoubleBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectDoubleBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Double/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Double/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type IntBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectIntBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Integer/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Integer/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type LongBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectLongBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Long/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Long/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type ShortBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectShortBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Short/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Short/BYTES)
+  (size* [this]
+    (.capacity this)))
+
+(extend-type CharBuffer
+  Releaseable
+  (release [this]
+    (when (.isDirect this)
+      (when-let [cleaner (.cleaner ^DirectCharBufferU this)]
+        (.clean cleaner)))
+    true)
+  Bytes
+  (bytesize* [this]
+    (* Character/BYTES (.capacity this)))
+  Entries
+  (sizeof* [_]
+    Character/BYTES)
+  (size* [this]
+    (.capacity this)))
 
 (extend-type Float
   Bytes
@@ -498,82 +531,30 @@
   (size* [this]
     (alength ^chars this)))
 
-(extend-type Buffer
+(extend-type (Class/forName "[Z")
   Bytes
   (bytesize* [this]
-    (* (long (sizeof* this)) (.capacity this)))
+    (* 2 (alength ^booleans this)))
   Entries
   (sizeof* [_]
-    Byte/BYTES)
+    2)
   (size* [this]
-    (.capacity this)))
+    (alength ^booleans this)))
 
-(extend-type FloatBuffer
-  Bytes
-  (bytesize* [this]
-    (* Float/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Float/BYTES)
-  (size* [this]
-    (.capacity this)))
+(defn wrap-byte ^bytes [^long x]
+  (doto (byte-array 1) (aset 0 (byte x))))
 
-(extend-type DoubleBuffer
-  Bytes
-  (bytesize* [this]
-    (* Double/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Double/BYTES)
-  (size* [this]
-    (.capacity this)))
+(defn wrap-short ^shorts [^long x]
+  (doto (short-array 1) (aset 0 (short x))))
 
-(extend-type IntBuffer
-  Bytes
-  (bytesize* [this]
-    (* Integer/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Integer/BYTES)
-  (size* [this]
-    (.capacity this)))
+(defn wrap-int ^ints [^long x]
+  (doto (int-array 1) (aset 0 x)))
 
-(extend-type LongBuffer
-  Bytes
-  (bytesize* [this]
-    (* Long/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Long/BYTES)
-  (size* [this]
-    (.capacity this)))
+(defn wrap-long ^longs [^long x]
+  (doto (long-array 1) (aset 0 x)))
 
-(extend-type ShortBuffer
-  Bytes
-  (bytesize* [this]
-    (* Short/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Short/BYTES)
-  (size* [this]
-    (.capacity this)))
+(defn wrap-float ^floats [^double x]
+  (doto (float-array 1) (aset 0 x)))
 
-(extend-type CharBuffer
-  Bytes
-  (bytesize* [this]
-    (* Character/BYTES (.capacity this)))
-  Entries
-  (sizeof* [_]
-    Character/BYTES)
-  (size* [this]
-    (.capacity this)))
-
-(def ^:const types
-  {:double Double/TYPE
-   :float Float/TYPE
-   :int Integer/TYPE
-   :long Long/TYPE
-   :short Short/TYPE
-   :byte Byte/TYPE
-   :char Character/TYPE
-   :bool Boolean/TYPE})
+(defn wrap-double ^doubles [^double x]
+  (doto (double-array 1) (aset 0 x)))
