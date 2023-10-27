@@ -9,6 +9,35 @@
 (ns ^{:author "Dragan Djuric"}
     uncomplicate.commons.core
   "Core Uncomplicate functions useful across all projects.
+
+  Projects that use native libraries and FFI typically need to dispose resources properly.
+  To make this uniform, the typical resource managers need to implement the [[Releaseable]]
+  protocol. Clients can then use the following functions to manage resources:
+  [[release]] [[releaseable?]], [[with-release]], [[let-release]].
+
+  It is often the case that you need an access to a mutable resource, but you want to
+  protect the object's resource from destruction. For such cases (and other cases
+  when this might be useful) there is a [[Viewable]] protocol. The [[view]] function
+  should return a 'portal' to the object whose [[release]] implementation does nothing
+  to the underlying resource.
+
+  For cases where you'd like to have the ability to inspect an object for various
+  internal detail, but don't want to clutter its interface with many additional
+  functions not related to the domain itself, implement the [[Info]] protocol.
+  The [[info]] method returns a hash-map of all available information, or, if provided
+  with a key, only the specific property related to that key.
+
+  Objects that manage data of certain size can implement protocols [[Entries]] and [[Bytes]].
+  Use the following functions to query for the data properties: [[size]], [[sizeof]], and [[bytesize]].
+
+  The following functions might be useful from time to time when dealing with primitive types.
+
+  [[types]], [[double-fn]], [[long-fn]],
+  [[wrap-byte]] [[wrap-short]] [[wrap-int]] [[wrap-long]][[wrap-float]][[wrap-double]],
+  [[Mappable]], [[map]], [[unmap]].
+
+  Please refer to the tests folder, and to the source of other Uncomplicate projects to
+  see how the functions from this namespace can be useful in various ways.
   "
   (:import java.util.Collection
            [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer ShortBuffer
@@ -541,20 +570,32 @@
   (size* [this]
     (alength ^booleans this)))
 
-(defn wrap-byte ^bytes [^long x]
+(defn wrap-byte
+  "Wraps a long number with a primitive byte array"
+  ^bytes [^long x]
   (doto (byte-array 1) (aset 0 (byte x))))
 
-(defn wrap-short ^shorts [^long x]
+(defn wrap-short
+  "Wraps a long number with a primitive short array"
+  ^shorts [^long x]
   (doto (short-array 1) (aset 0 (short x))))
 
-(defn wrap-int ^ints [^long x]
+(defn wrap-int
+  "Wraps a long number with a primitive int array"
+  ^ints [^long x]
   (doto (int-array 1) (aset 0 x)))
 
-(defn wrap-long ^longs [^long x]
+(defn wrap-long
+  "Wraps a long number with a primitive long array"
+  ^longs [^long x]
   (doto (long-array 1) (aset 0 x)))
 
-(defn wrap-float ^floats [^double x]
+(defn wrap-float
+  "Wraps a double number with a primitive float array"
+  ^floats [^double x]
   (doto (float-array 1) (aset 0 x)))
 
-(defn wrap-double ^doubles [^double x]
+(defn wrap-double
+  "Wraps a double number with a primitive double array"
+  ^doubles [^double x]
   (doto (double-array 1) (aset 0 x)))
