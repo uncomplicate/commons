@@ -164,7 +164,7 @@
     (Paths/get path-name file-array)))
 
 (defn create-temp-dir
-  "Creates a temp directory appropriate for the operating system, prefixed with 'uncomplicate_".
+  "Creates a temp directory appropriate for the operating system, prefixed with 'uncomplicate_."
   [prefix]
   (java.nio.file.Files/createTempDirectory (or prefix "uncomplicate_") (make-array FileAttribute 0)))
 
