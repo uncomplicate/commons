@@ -30,6 +30,4 @@
                            :themes [:rdash]}
                    :jvm-opts ^:replace ["-Dclojure.compiler.direct-linking=true"
                                         "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"
-                                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]}}
-
-  :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"])
+                                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"]}})
