@@ -22,7 +22,7 @@
                                  *assert* true
                                  *unchecked-math* :warn-on-boxed
                                  *print-length* 128}
-                   :dependencies [[midje "1.10.9"]
+                   :dependencies [[midje "1.10.10"]
                                   [codox-theme-rdash "0.1.2"]]
                    :codox {:metadata {:doc/format :markdown}
                            :source-uri "http://github.com/uncomplicate/commons/blob/master/{filepath}#L{line}"
