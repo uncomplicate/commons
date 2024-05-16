@@ -361,7 +361,7 @@
   "Generates a pseudo-random seed for jump-starting pseudo-random generators. Random enough for most
   simulation algorithms that we use in Uncomplicate, and very cheap to acquire."
   ^long []
-  (- (long (rand Long/MAX_VALUE)) (quot Long/MAX_VALUE 2)))
+  (- (long (rand Integer/MAX_VALUE)) (quot Integer/MAX_VALUE 2)))
 
 ;; ===================== Work Groups utilities ===================================
 
