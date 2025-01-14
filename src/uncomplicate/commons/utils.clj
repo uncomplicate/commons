@@ -337,12 +337,12 @@
 
 (defn random-access
   "Creates a random access file."
-  ([^String path flag]
+  ([path flag]
    (RandomAccessFile. path (case flag
                              :read-write "rw"
                              :read "r"
                              (name flag))))
-  ([^String path]
+  ([path]
    (RandomAccessFile. path "rw")))
 
 ;;====================== RNG Utils ===============================================
