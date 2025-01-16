@@ -39,6 +39,7 @@
            java.net.URI
            [java.nio ByteBuffer DirectByteBuffer ByteOrder ShortBuffer IntBuffer LongBuffer]
            [java.nio.file Path Paths Files FileVisitOption OpenOption StandardOpenOption]
+           java.io.File
            java.nio.file.attribute.FileAttribute
            [java.nio.channels FileChannel FileChannel$MapMode]))
 
@@ -338,12 +339,15 @@
 (defn random-access
   "Creates a random access file."
   ([path flag]
-   (RandomAccessFile. path (case flag
-                             :read-write "rw"
-                             :read "r"
-                             (name flag))))
+   (let [flag (case flag
+                :read-write "rw"
+                :read "r"
+                (name flag))]
+     (if (string? path)
+       (RandomAccessFile. ^String path flag)
+       (RandomAccessFile. ^File path flag))))
   ([path]
-   (RandomAccessFile. path "rw")))
+   (random-access path :read-write)))
 
 ;;====================== RNG Utils ===============================================
 
