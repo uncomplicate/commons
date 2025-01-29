@@ -141,6 +141,15 @@
   "
   (release [this] "Releases all resources held by this object."))
 
+(let [obj-impl (delay (find-protocol-impl Releaseable (Object.)))]
+  "Checks whether the implementation of Releaseable for `this` isn't
+   identical to the catch-all implementations for `nil` and `Object`."
+  (defn nontrivially-releaseable?
+    [this]
+    (and
+      (some? this)
+      (not (identical? @obj-impl (find-protocol-impl Releasable this))))))
+
 (defn releaseable?
   "Checks whether this is releaseable (in terms of Releaseable protocol)."
   [this]
