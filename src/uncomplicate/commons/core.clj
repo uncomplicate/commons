@@ -43,7 +43,7 @@
            [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer ShortBuffer
             CharBuffer Buffer DirectByteBuffer DirectFloatBufferU DirectDoubleBufferU
             DirectLongBufferU DirectIntBufferU DirectShortBufferU DirectCharBufferU]
-           [clojure.lang Sequential AReference Atom Ref]))
+           [clojure.lang Sequential AReference Atom Ref Delay]))
 
 (def ^{:const true
        :doc "Available mappings from keywords to Java primitive types."}
@@ -271,6 +271,11 @@
     (let [res (release (deref this))]
       (ref-set this nil)
       res)))
+
+(extend-type Delay
+  Releaseable
+  (release [this]
+    (release (deref this))))
 
 (extend-type Sequential
   Info
