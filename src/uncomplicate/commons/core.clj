@@ -288,7 +288,10 @@
   (release [this]
     (doseq [e this]
       (release e))
-    true))
+    true)
+  Entries
+  (size* [this]
+    (count this)))
 
 (extend-type Collection
   Info
