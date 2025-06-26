@@ -57,6 +57,18 @@
    :char Character/TYPE
    :bool Boolean/TYPE})
 
+(def ^{:const true
+       :doc "Available mappings from keywords to Java primitive size in bytes."}
+  types-size
+  {:double Double/BYTES
+   :float Float/BYTES
+   :int Integer/BYTES
+   :long Long/BYTES
+   :short Short/BYTES
+   :byte Byte/BYTES
+   :char Character/BYTES
+   :bool 1})
+
 (defmacro double-fn
   "Wraps a function into a primitive type-annotated function (to satisfy the compiler in some cases)."
   [f]
@@ -114,7 +126,7 @@
   (size* [this] "Number of entries in data."))
 
 (defprotocol Bytes
-  "Object that has size in bytes."
+  "Object that has"
   (bytesize* [this] "The size of this object's data in bytes."))
 
 (defn size
@@ -304,7 +316,10 @@
   (release [coll]
     (doseq [e coll]
       (release e))
-    true))
+    true)
+  Entries
+  (size* [this]
+    (count this)))
 
 (extend-type Buffer
   Bytes
