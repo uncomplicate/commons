@@ -35,6 +35,7 @@
   [[count-groups]]
   "
   (:import java.security.SecureRandom
+           java.util.Random
            java.io.RandomAccessFile
            java.net.URI
            [java.nio ByteBuffer DirectByteBuffer ByteOrder ShortBuffer IntBuffer LongBuffer]
@@ -351,21 +352,26 @@
 
 ;;====================== RNG Utils ===============================================
 
-(let [srng (SecureRandom.)]
-  (defn generate-secure-seed
-    "Generates a secure seed. This pseudo-random number is `random more than enough` for almost all
+(defn generate-secure-seed
+  "Generates a secure seed. This pseudo-random number is `random more than enough` for almost all
   purposes Uncomplicate projects deal with, but it is often slow to generate as we have to wait for
   the operating systems to do the rain dance to acquire it. For most simulation work, it is much
   better to use [[generate-seed]], which returns fairly good pseudo-random numbers that are further
   used as seeds of pseudo-random number generators."
-    ^long []
-    (.getLong (ByteBuffer/wrap (.generateSeed srng Long/BYTES)) 0)))
+  (^long []
+   (.getLong (ByteBuffer/wrap (.generateSeed (SecureRandom/getInstance "NativePRNG") Long/BYTES)) 0))
+  ([^long bytesize]
+   (ByteBuffer/wrap (.generateSeed (SecureRandom/getInstance "NativePRNG") bytesize))))
 
 (defn generate-seed
   "Generates a pseudo-random seed for jump-starting pseudo-random generators. Random enough for most
   simulation algorithms that we use in Uncomplicate, and very cheap to acquire."
-  ^long []
-  (- (long (rand Integer/MAX_VALUE)) (quot Integer/MAX_VALUE 2)))
+  (^long []
+   (.nextLong (Random.)))
+  ([^long bytesize]
+   (let [result (byte-array bytesize)]
+     (.nextBytes (Random.) result)
+     (ByteBuffer/wrap result))))
 
 ;; ===================== Work Groups utilities ===================================
 

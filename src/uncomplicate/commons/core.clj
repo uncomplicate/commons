@@ -67,7 +67,23 @@
    :short Short/BYTES
    :byte Byte/BYTES
    :char Character/BYTES
-   :bool 1})
+   :bool 1
+   Double Double/BYTES
+   Float Float/BYTES
+   Integer Integer/BYTES
+   Long Long/BYTES
+   Short Short/BYTES
+   Byte Byte/BYTES
+   Character Character/BYTES
+   Boolean 1
+   double Double/BYTES
+   float Float/BYTES
+   int Integer/BYTES
+   long Long/BYTES
+   short Short/BYTES
+   byte Byte/BYTES
+   char Character/BYTES
+   boolean 1})
 
 (defmacro double-fn
   "Wraps a function into a primitive type-annotated function (to satisfy the compiler in some cases)."
