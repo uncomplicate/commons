@@ -228,6 +228,14 @@
                                     (throw e#)))))
     :else (throw (IllegalArgumentException. "try-release only allows Symbols in bindings"))))
 
+(extend-type Class
+  Info
+  (info
+    ([this]
+     (.getName this))
+    ([this _]
+     (.getName this))))
+
 (extend-type Object
   Viewable
   (view [this]
