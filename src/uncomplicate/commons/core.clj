@@ -61,11 +61,19 @@
        :doc "Available mappings from keywords to Java primitive size in bytes."}
   types-size
   {:double Double/BYTES
+   :float64 Double/BYTES
+   :f64 Double/BYTES
    :float Float/BYTES
+   :float32 Float/BYTES
+   :f32 Float/BYTES
    :int Integer/BYTES
+   :int32 Integer/BYTES
    :long Long/BYTES
+   :int64 Long/BYTES
    :short Short/BYTES
+   :int16 Short/BYTES
    :byte Byte/BYTES
+   :int8 Byte/BYTES
    :char Character/BYTES
    :bool 1
    Double Double/BYTES
@@ -328,6 +336,14 @@
   Entries
   (size* [this]
     (count this)))
+
+(extend-type clojure.lang.APersistentVector
+  Info
+  (info
+    ([this]
+     (mapv info this))
+    ([this info-type]
+     (mapv #(info % info-type) this))))
 
 (extend-type Collection
   Info
