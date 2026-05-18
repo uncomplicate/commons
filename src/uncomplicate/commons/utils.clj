@@ -42,7 +42,8 @@
            [java.nio.file Path Paths Files FileVisitOption OpenOption StandardOpenOption]
            java.io.File
            java.nio.file.attribute.FileAttribute
-           [java.nio.channels FileChannel FileChannel$MapMode]))
+           [java.nio.channels FileChannel FileChannel$MapMode]
+           [io.github.classgraph ClassGraph ScanResult ResourceList]))
 
 ;; ========= Bitfild masks ========================================
 
@@ -381,3 +382,19 @@
   (if (< per-group items)
     (quot (+ items (dec per-group)) per-group)
     1))
+
+;; ===================== Path resoruces  ===================================
+
+(defn scan-resources
+  ([paths extension]
+   (let [cg (ClassGraph.)
+         sr (.scan (.acceptPaths ^ClassGraph cg (into-array String paths)))]
+     (try
+       (.getPaths ^ResourceList (.getResourcesWithExtension sr extension))
+       (finally (.close sr)))))
+  ([paths]
+   (let [cg (ClassGraph.)
+         sr (.scan (.acceptPaths ^ClassGraph cg (into-array String paths)))]
+     (try
+       (.getPaths ^ResourceList (.getAllResources sr))
+       (finally (.close sr))))))

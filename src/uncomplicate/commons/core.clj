@@ -39,11 +39,11 @@
   Please refer to the tests folder, and to the source of other Uncomplicate projects to
   see how the functions from this namespace can be useful in various ways.
   "
-  (:import java.util.Collection
+  (:import java.util.Collection java.lang.AutoCloseable
            [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer ShortBuffer
             CharBuffer Buffer DirectByteBuffer DirectFloatBufferU DirectDoubleBufferU
             DirectLongBufferU DirectIntBufferU DirectShortBufferU DirectCharBufferU]
-           [clojure.lang Sequential AReference Atom Ref Delay]))
+           [clojure.lang Sequential AReference Atom Ref Delay IFn AFn]))
 
 (def ^{:const true
        :doc "Available mappings from keywords to Java primitive types."}
@@ -257,6 +257,11 @@
   Releaseable
   (release [_]
     true))
+
+(extend-type AutoCloseable
+  Releaseable
+  (release [this]
+    (.close this)))
 
 (extend-type Number
   Releaseable
@@ -662,3 +667,29 @@
   "Wraps a double number with a primitive double array"
   ^doubles [^double x]
   (doto (double-array 1) (aset 0 x)))
+
+(deftype ReleaseableFn [f to-release]
+  Releaseable
+  (release [_]
+    (doseq [r to-release]
+      (release r)))
+  IFn
+  (invoke [_]
+    (f))
+  (invoke [_ x]
+    (f x))
+  (invoke [_ x y]
+    (f x y))
+  (invoke [_ x y z]
+    (f x y z))
+  (invoke [_ x y z u]
+    (f x y z u))
+  (invoke [_ x y z u v]
+    (f x y z u v))
+  (invoke [_ x y z u v w]
+    (f x y z u v w))
+  (applyTo [this xs]
+    (AFn/applyToHelper f xs)))
+
+(defn releaseable [f & rs]
+  (->ReleaseableFn f rs))
