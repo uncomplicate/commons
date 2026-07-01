@@ -34,6 +34,7 @@
   And we may need to count groups of items in a larger group.
   [[count-groups]]
   "
+  (:require [clojure.tools.logging :refer [info]])
   (:import java.security.SecureRandom
            java.util.Random
            java.io.RandomAccessFile
@@ -398,3 +399,11 @@
      (try
        (.getPaths ^ResourceList (.getAllResources sr))
        (finally (.close sr))))))
+
+;; ====================== Class loader ====================================
+
+(defn load-class [^String classname]
+  (try (.loadClass (clojure.lang.DynamicClassLoader.) classname)
+       (catch Exception e
+         (info (format "Class %s is not available." classname))
+         nil)))

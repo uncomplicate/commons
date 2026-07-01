@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.22.0"
+(defproject uncomplicate/commons "0.23.0"
   :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
@@ -14,6 +14,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.12.5"]
+                 [org.clojure/tools.logging "1.3.1"]
                  [io.github.classgraph/classgraph "4.8.184"]]
 
   :profiles {:dev {:plugins [[lein-midje "3.2.1"]
