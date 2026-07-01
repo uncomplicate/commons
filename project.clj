@@ -6,7 +6,7 @@
 ;;   the terms of this license.
 ;;   You must not remove this notice, or any other, from this software.
 
-(defproject uncomplicate/commons "0.20.0"
+(defproject uncomplicate/commons "0.22.0"
   :description "Common Uncomplicate utilities."
   :url "https://github.com/uncomplicate/commons"
   :scm {:name "git"
@@ -33,4 +33,4 @@
                                         "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
                                         "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"]}}
 
-  :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"])
+  :javac-options ["--release" "21" "-Xlint:-options"])

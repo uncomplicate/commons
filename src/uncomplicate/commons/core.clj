@@ -41,8 +41,7 @@
   "
   (:import java.util.Collection java.lang.AutoCloseable
            [java.nio ByteBuffer FloatBuffer DoubleBuffer LongBuffer IntBuffer ShortBuffer
-            CharBuffer Buffer DirectByteBuffer DirectFloatBufferU DirectDoubleBufferU
-            DirectLongBufferU DirectIntBufferU DirectShortBufferU DirectCharBufferU]
+            CharBuffer Buffer]
            [clojure.lang Sequential AReference Atom Ref Delay IFn AFn]))
 
 (def ^{:const true
@@ -66,6 +65,9 @@
    :float Float/BYTES
    :float32 Float/BYTES
    :f32 Float/BYTES
+   :half Short/BYTES
+   :float16 Short/BYTES
+   :f16 Short/BYTES
    :int Integer/BYTES
    :int32 Integer/BYTES
    :long Long/BYTES
@@ -377,12 +379,6 @@
     (.capacity this)))
 
 (extend-type ByteBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectByteBuffer this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (.capacity this))
@@ -393,12 +389,6 @@
     (.capacity this)))
 
 (extend-type FloatBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectFloatBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Float/BYTES (.capacity this)))
@@ -409,12 +399,6 @@
     (.capacity this)))
 
 (extend-type DoubleBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectDoubleBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Double/BYTES (.capacity this)))
@@ -425,12 +409,6 @@
     (.capacity this)))
 
 (extend-type IntBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectIntBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Integer/BYTES (.capacity this)))
@@ -441,12 +419,6 @@
     (.capacity this)))
 
 (extend-type LongBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectLongBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Long/BYTES (.capacity this)))
@@ -457,12 +429,6 @@
     (.capacity this)))
 
 (extend-type ShortBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectShortBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Short/BYTES (.capacity this)))
@@ -473,12 +439,6 @@
     (.capacity this)))
 
 (extend-type CharBuffer
-  Releaseable
-  (release [this]
-    (when (.isDirect this)
-      (when-let [cleaner (.cleaner ^DirectCharBufferU this)]
-        (.clean cleaner)))
-    true)
   Bytes
   (bytesize* [this]
     (* Character/BYTES (.capacity this)))
